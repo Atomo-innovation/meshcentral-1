@@ -4612,12 +4612,12 @@
 
                 // If there is nothing to display, explain the problem
                 var viewNothing = false;
-                if ((r == '') && (nodes.length > 0) && ((Q('SearchInput').value != '') || (Q('DevFilterSelect').value != 0))) {
+                if ((r == '') && ((Q('SearchInput').value != '') || (Q('DevFilterSelect').value != 0))) {
                     viewNothing = true;
-                    if (sort == 3) {
+                    if ((sort == 3) && (nodes.length > 0)) {
                         r = '<div style="margin:30px">' + "No devices are included in any groups, click on a device's \"Groups\" to add to a group." + '</div>';
                     } else {
-                        r = '<div style="margin:30px">' + "No devices matching this search." + ' <a onclick=clearDeviceSearch()>' + "Clear search filter" + '</a></div>';
+                        r = '<div style="margin:30px">' + "No devices matching this search." + ' <a onclick=clearDeviceSearch()>' + "Clear search filter" + '</a>' + getEmptySearchQuickAddHtml() + '</div>';
                     }
                 }
 
@@ -5396,6 +5396,29 @@
             //    r += ' <a href=# style=cursor:pointer;font-size:small title="' + "Switch Intel AMT to Admin Control Mode (ACM)." + '" onclick=\'return showAmtAcmSetup()\'>' + "ACM" + '</a>';
             //}
             return r;
+        }
+
+        // Shown when a search/filter hides all devices but groups exist — same actions as device group headers
+        function getEmptySearchQuickAddHtml() {
+            var lines = '', sortedMeshes = [];
+            for (var imx in meshes) { sortedMeshes.push(meshes[imx]); }
+            sortedMeshes.sort(nameSort);
+            for (var jmx in sortedMeshes) {
+                var mesh = sortedMeshes[jmx], meshrights = GetMeshRights(mesh);
+                var actions = getMeshActions(mesh, meshrights);
+                if (actions == '') continue;
+                lines += '<div style=margin-top:8px><b>' + EscapeHtml(mesh.name) + '</b>' + actions + '</div>';
+            }
+            var canCreateMesh = ((userinfo.siteadmin == 0xFFFFFFFF) || ((userinfo.siteadmin & 64) == 0));
+            var extra = '';
+            if ((lines == '') && canCreateMesh) {
+                extra = '<div style=margin-top:8px><a href=# onclick="return account_createMesh()">' + "Add Device Group" + '</a></div>';
+            } else if (lines == '') {
+                extra = '<div style=margin-top:8px><i>' + "Ask an administrator to add you to a device group." + '</i></div>';
+            }
+            if ((lines == '') && (extra == '')) return '';
+            var hdr = (lines != '') ? ("Add a device:") : ("Get started:");
+            return '<div style=margin-top:16px;font-size:13px;line-height:1.6><i>' + hdr + '</i>' + lines + extra + '</div>';
         }
 
         function addLocalDeviceToMesh(meshid) {

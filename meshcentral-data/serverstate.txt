@@ -1,9 +1,9 @@
-time=1773726709790
+time=1778905876299
 state=running
-server-pid=74811
-server-parent-pid=74800
-redirect-port=81
+server-pid=16871
+server-parent-pid=16859
+redirect-port=1024
 mps-port=4433
-mps-name=myserver.mydomain.com
-servername=myserver.mydomain.com
-https-port=444
+mps-name=192.168.1.30
+servername=192.168.1.30
+https-port=4434

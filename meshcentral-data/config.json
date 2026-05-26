@@ -1,10 +1,16 @@
 {
   "$schema": "https://raw.githubusercontent.com/Ylianst/MeshCentral/master/meshcentral-config-schema.json",
   "settings": {
-    "cert": "myserver.mydomain.com",
-    "port": 443,
-    "redirPort": 80,
+    "cert": "65.2.142.160",
+    "port": 4434,
+    "mpsPort": 4433,
+    "redirPort": 1024,
+    "agentaliasdns": "65.2.142.160",
+    "autobackup": {
+      "backuppath": "meshcentral-data/backups"
+    },
     "sessionKey": "MyReallySecretPassword1",
+    "disablePowerActions": true,
     "mysql": {
       "host": "127.0.0.1",
       "port": 3306,
@@ -17,7 +23,10 @@
     "": {
       "title": "MyServer",
       "NewAccounts": true,
-      "minify": false
+      "minify": false,
+      "sitestyle": 2,
+      "forceclassicui": true,
+      "newaccountsrights": []
     }
   }
 }

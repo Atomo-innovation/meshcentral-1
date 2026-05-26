@@ -1,0 +1,5 @@
+{"$$indexCreated":{"fieldName":"time","unique":false,"sparse":false}}
+{"$$indexCreated":{"fieldName":"expire","unique":false,"sparse":false}}
+{"$$indexCreated":{"fieldName":"time","expireAfterSeconds":2592000}}
+{"$$indexCreated":{"fieldName":"expire","expireAfterSeconds":0}}
+{"time":{"$$date":1775040257258},"expire":{"$$date":1775213057258},"mem":{"rss":167256064,"heapTotal":49782784,"heapUsed":36866432,"external":38750547,"arrayBuffers":36369853},"conn":{"ca":1,"cu":0,"us":0,"rs":0,"am":0,"amc":0},"traffic":{"httpRequestCount":0,"httpWebSocketCount":0,"httpIn":0,"httpOut":0,"relayCount":{},"relayIn":{},"relayOut":{},"localRelayCount":{},"localRelayIn":{},"localRelayOut":{},"AgentCtrlIn":0,"AgentCtrlOut":0,"LMSIn":0,"LMSOut":0,"CIRAIn":0,"CIRAOut":0,"time":1775040257258,"delta":300038},"cpu":[3.05,3.15,2.82],"first":true,"_id":"TFnQwNGxyVAqFVSD"}

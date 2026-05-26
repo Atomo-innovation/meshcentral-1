@@ -1,0 +1,22 @@
+# Minimal MediaMTX config for local RTSP publishing.
+# Docs: https://github.com/bluenviron/mediamtx
+
+logLevel: info
+
+rtsp: yes
+rtspAddress: :8554
+
+rtmp: yes
+rtmpAddress: :1935
+
+hls: yes
+hlsAddress: :8888
+
+webrtc: yes
+webrtcAddress: :8889
+
+paths:
+  live:
+    # Allow anyone on LAN to publish/play (change if needed).
+    source: publisher
+

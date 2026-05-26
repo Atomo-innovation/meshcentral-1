@@ -2238,9 +2238,9 @@ module.exports.CreateMeshUser = function (parent, db, ws, req, args, domain, use
                     var mesh = parent.meshes[command.meshid];
                     if (mesh == null) { if (command.responseid != null) { try { ws.send(JSON.stringify({ action: 'deletemesh', responseid: command.responseid, result: 'Unknown device group' })); } catch (ex) { } } return; }
 
-                    // Check if this user has rights to do this
+                    // Check if this user has rights to do this (device group admin; cannot use GetMeshRights == MESHRIGHT_ADMIN when user.removeRights is set)
                     var err = null;
-                    if (parent.GetMeshRights(user, mesh) != MESHRIGHT_ADMIN) { err = 'Access denied'; }
+                    if ((parent.IsMeshAdministrator(user, mesh) !== true) && (parent.GetMeshRights(user, mesh) != MESHRIGHT_ADMIN)) { err = 'Access denied'; }
                     if ((command.meshid.split('/').length != 3) || (command.meshid.split('/')[1] != domain.id)) { err = 'Invalid group'; } // Invalid domain, operation only valid for current domain
 
                     // Handle any errors
@@ -3224,6 +3224,18 @@ module.exports.CreateMeshUser = function (parent, db, ws, req, args, domain, use
                 {
                     if (common.validateArray(command.nodeids, 1) == false) break; // Check nodeid's
                     if (common.validateInt(command.actiontype, 2, 401) == false) break; // Check actiontype
+
+                    // Optional safety switch: Disable all device power actions server-side.
+                    // This blocks agent power-off/reset/sleep and AMT power actions, but still allows "flash/vibrate" (400/401).
+                    if ((parent.parent.config != null) && (parent.parent.config.settings != null) && (parent.parent.config.settings.disablePowerActions === true) && (command.actiontype < 400)) {
+                        if (command.responseid != null) {
+                            try { ws.send(JSON.stringify({ action: 'poweraction', responseid: command.responseid, result: 'Power actions are disabled on this server.' })); } catch (ex) { }
+                        } else {
+                            try { ws.send(JSON.stringify({ action: 'poweraction', result: 'Power actions are disabled on this server.' })); } catch (ex) { }
+                        }
+                        break;
+                    }
+
                     for (i in command.nodeids) {
                         var nodeid = command.nodeids[i];
 

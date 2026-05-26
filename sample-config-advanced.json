@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/Ylianst/MeshCentral/master/meshcentral-config-schema.json",
   "__comment__": "This is a sample advanced configuration file, all values and sections that start with underscore (_) are ignored. Edit a section and remove the _ in front of the name. Refer to the user's guide for details.",
   "settings": {
-    "cert": "myserver.mydomain.com",
+    "cert": "localhost",
     "_SQLite3": true,
     "_acebase": { "_sponsor": true },
     "_mongoDb": "mongodb://127.0.0.1:27017",

@@ -1679,6 +1679,23 @@ module.exports.CreateWebServer = function (parent, db, args, certificates, doneF
                                 if (obj.db.changeStream) { event.noact = 1; } // If DB change stream is active, don't use this event to create the user. Another event will come.
                                 obj.parent.DispatchEvent(['*', 'server-users'], obj, event);
                             }
+                            // If the user came from Atomo (return=...), don't auto-login into MeshCentral.
+                            // Instead, stay on the account creation flow and let the UI offer a "Return Atomo login" action.
+                            if ((req.query != null) && (typeof req.query.return == 'string') && (req.query.return.length > 0)) {
+                                try {
+                                    delete req.session.userid;
+                                    delete req.session.ip;
+                                    delete req.session.loginToken;
+                                } catch (ex) { }
+                                req.session.loginmode = 2; // show account creation panel
+
+                                // Add created=1 to the query string so the login page can show a "return" popup.
+                                const qp = getQueryPortion(req);
+                                const qp2 = (qp.length > 0) ? (qp + '&created=1') : '?created=1';
+                                if (direct === true) { res.redirect(domain.url + qp2); } else { res.redirect(domain.url + qp2); }
+                                return;
+                            }
+
                             if (direct === true) { handleRootRequestEx(req, res, domain); } else { res.redirect(domain.url + getQueryPortion(req)); }
                         }
                     });
@@ -3241,6 +3258,8 @@ module.exports.CreateWebServer = function (parent, db, args, certificates, doneF
                 var webstateJSON = JSON.parse(webstate);
                 if (req.query.sitestyle != null) {
                     if (req.query.sitestyle == 3) { uiViewMode = 'default3'; }
+                } else if (domain.forceclassicui === true) {
+                    // Same Classic My Devices for every user (new accounts included); ignore saved Modern preference
                 } else if (webstateJSON && webstateJSON.uiViewMode == 3) {
                     uiViewMode = 'default3';
                 } else if (domain.sitestyle == 3) {
@@ -9368,6 +9387,38 @@ module.exports.CreateWebServer = function (parent, db, args, certificates, doneF
         }
 
         return removeUserRights(rights, user);
+    }
+
+    // True if the user is a device group administrator (full rights on the mesh link before removeUserRights).
+    // GetMeshRights() never returns MESHRIGHT_ADMIN when user.removeRights is set, so checks that compare to
+    // 0xFFFFFFFF must use this helper instead.
+    obj.IsMeshAdministrator = function (user, mesh) {
+        if ((user == null) || (mesh == null)) { return false; }
+        if (typeof user == 'string') { user = obj.users[user]; }
+        if (user == null) { return false; }
+        var meshid;
+        if (typeof mesh == 'string') {
+            meshid = mesh;
+        } else if ((typeof mesh == 'object') && (typeof mesh._id == 'string')) {
+            meshid = mesh._id;
+        } else { return false; }
+
+        if ((user.siteadmin == 0xFFFFFFFF) && ((parent.config.settings.managealldevicegroups.indexOf(user._id) >= 0) || (user.links && Object.keys(user.links).some(key => parent.config.settings.managealldevicegroups.indexOf(key) >= 0))) && (meshid.startsWith('mesh/' + user.domain + '/'))) { return true; }
+
+        if (user.links == null) { return false; }
+        var r = user.links[meshid];
+        if ((r != null) && (r.rights == 0xFFFFFFFF)) { return true; }
+
+        for (var i in user.links) {
+            if (i.startsWith('ugrp')) {
+                const g = obj.userGroups[i];
+                if (g && (g.links != null)) {
+                    r = g.links[meshid];
+                    if ((r != null) && (r.rights == 0xFFFFFFFF)) { return true; }
+                }
+            }
+        }
+        return false;
     }
 
     // Returns true if the user can view the given device group

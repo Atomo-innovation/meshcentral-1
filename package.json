@@ -17,6 +17,10 @@
   "description": "Web based remote computer management server",
   "author": "Ylian Saint-Hilaire <ylianst@gmail.com>",
   "main": "meshcentral.js",
+  "scripts": {
+    "set-board-host": "node scripts/set-meshcentral-board-host.js",
+    "sync-meshcentral-aws-host": "node scripts/set-meshcentral-board-host.js --ec2-public-ipv4"
+  },
   "bin": {
     "meshcentral": "bin/meshcentral"
   },

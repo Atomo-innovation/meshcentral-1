@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html dir="ltr" xmlns="http://www.w3.org/1999/xhtml">
 <head lang="en">
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
@@ -164,7 +164,7 @@
                                 </td>
                             </tr>
                         </table>
-                        <hr /><a onclick="return xgo(1,event);" href="#" style=cursor:pointer>Back to login</a>
+                        <hr /><a onclick="return xgo(1,event);" href="#" style=cursor:pointer>Back to login</a><span id="backToAtomoSpan" style="display:none"> | <a id="backToAtomoLink" href="#" style="cursor:pointer">Back to Atomo</a></span>
                         <input id=createformargs name="urlargs" type="hidden" value="" />
                         <input id=createformcaptcha name="captchaargs" type="hidden" value="{{{newAccountCaptcha}}}" />
                     </form>
@@ -456,8 +456,19 @@
             }
 
             // Fix links if a loginKey if used
-            var urlargs = parseUriArgs();
+            var urlargs = parseUriArgs(true);
             //if (urlargs.key) { Q('termsLinkFooter').href += '?key=' + urlargs.key; }
+            if ((typeof urlargs.return == 'string') && (urlargs.return.length > 0)) {
+                var r = urlargs.return;
+                if ((r.startsWith('http://') || r.startsWith('https://') || r.startsWith('/')) && (Q('backToAtomoLink') != null)) {
+                    Q('backToAtomoLink').href = r;
+                    QV('backToAtomoSpan', true);
+                }
+            }
+            if ((urlargs != null) && ((urlargs.created == 1) || (urlargs.created == '1')) && (Q('backToAtomoLink') != null) && (QS('backToAtomoSpan').display != 'none')) {
+                Q('idx_dlgOkButton').value = "Return Atomo login";
+                setDialogMode(1, "Account created", 1, function () { window.location.href = Q('backToAtomoLink').href; }, "Account created successfully.");
+            }
 
             // Show Language Select Box if needed
             if (showLanguageSelect === 'top' || showLanguageSelect === 'bottom') {
@@ -542,7 +553,10 @@
             }
 
             validateCreate();
-            if (loginMode.length != 0) { go(parseInt(loginMode)); } else { go(1); }
+            var wantCreateAccount = (urlargs && ((urlargs.createaccount == 1) || (urlargs.createaccount == '1') || (urlargs.create == 1) || (urlargs.create == '1')));
+            if (wantCreateAccount && ((newAccount === '1') || (newAccount === 'true'))) { go(2); }
+            else if (loginMode.length != 0) { go(parseInt(loginMode)); }
+            else { go(1); }
             QV('newAccountDiv', (newAccount === '1') || (newAccount === 'true')); // If new accounts are not allowed, don't display the new account link.
             if ((passhint != null) && (passhint.length > 0)) { QV('showPassHintLink', true); }
             QV('newAccountPass', (newAccountPass == 1));

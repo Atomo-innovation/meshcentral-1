@@ -24,7 +24,7 @@
   "_letsencrypt": {
     "__comment__": "Requires NodeJS 8.x or better, Go to https://letsdebug.net/ first before trying Let's Encrypt.",
     "email": "myemail@mydomain.com",
-    "names": "myserver.mydomain.com",
+    "names": "localhost",
     "skipChallengeVerification": true,
     "production": false
   }

@@ -13,6 +13,7 @@
 [Ee]mails/translations/
 [Pp]ublic/*-min.htm
 [Vv]iews/*-min.handlebars
+meshcentral-data/backups/
 meshcentral.db
 meshcentral.db.json
 mesherrors.txt
